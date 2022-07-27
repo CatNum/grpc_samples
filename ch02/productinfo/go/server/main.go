@@ -11,10 +11,10 @@ import (
 	"net"
 
 	"github.com/gofrs/uuid"
-	pb "productinfo/server/ecommerce"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	pb "productinfo/server/ecommerce"
 )
 
 const (
@@ -53,12 +53,16 @@ func (s *server) GetProduct(ctx context.Context, in *pb.ProductID) (*pb.Product,
 }
 
 func main() {
+	// TCP监听器
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+	// 创建新的grpc服务器实例
 	s := grpc.NewServer()
+	// 将服务注册到grpc服务器上
 	pb.RegisterProductInfoServer(s, &server{})
+	// 在指定端口开始监听传入的消息
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
