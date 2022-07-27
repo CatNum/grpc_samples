@@ -6,6 +6,7 @@ import (
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 
 	wrapper "github.com/golang/protobuf/ptypes/wrappers"
@@ -168,10 +169,10 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	// 注册服务器
+	// 将服务注册到服务器上
 	pb.RegisterOrderManagementServer(s, &server{})
 	// Register reflection service on gRPC server.
-	// reflection.Register(s)
+	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
