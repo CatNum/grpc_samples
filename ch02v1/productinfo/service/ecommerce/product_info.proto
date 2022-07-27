@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package ecommerce;
+option go_package = "../ecommerce";
+
+service ProductInfo{
+  rpc addProduct(Product) returns (ProductID);//定义添加产品
+  rpc getProduct(ProductID) returns(Product);//定义获取产品，传入和返回参数只能有一个
+}
+
+//定义产品消息体,同一个消息体不能出现同样的编号
+message Product {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  float price = 4 ;
+}
+
+//定义产品编号消息体
+message ProductID{
+  string value = 1;
+}

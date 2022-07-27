@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	pb "github.com/grpc-up-and-running/samples/ch05/interceptors/order-service/go/order-service-gen"
 	wrapper "github.com/golang/protobuf/ptypes/wrappers"
+	pb "github.com/grpc-up-and-running/samples/ch05/interceptors/order-service/go/order-service-gen"
 	"google.golang.org/grpc"
 	"io"
 	"log"
@@ -100,12 +100,15 @@ func asncClientBidirectionalRPC (streamProcOrder pb.OrderManagement_ProcessOrder
 
 func orderUnaryClientInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	// Pre-processor phase
+	// 前置处理
 	log.Println("Method : " + method)
 
 	// Invoking the remote method
+	// 调用远程方法
 	err := invoker(ctx, method, req, reply, cc, opts...)
 
 	// Post-processor phase
+	// 后置处理
 	log.Println(reply)
 
 	return err
