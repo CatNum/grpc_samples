@@ -36,7 +36,9 @@ func (s *server) AddOrder(ctx context.Context, orderReq *pb.Order) (*wrappers.St
 
 
 	// ***** Reading Metadata from Client *****
+	// 读取客户端的元数据
 	md, metadataAvailable := metadata.FromIncomingContext(ctx)
+	// 利用元数据执行某些操作
 	if !metadataAvailable {
 		return nil, status.Errorf(codes.DataLoss, "UnaryEcho: failed to get metadata")
 	}
@@ -48,6 +50,7 @@ func (s *server) AddOrder(ctx context.Context, orderReq *pb.Order) (*wrappers.St
 	}
 
 	// Creating and sending a header.
+	// 创建并发送头信息
 	header := metadata.New(map[string]string{"location": "San Jose", "timestamp": time.Now().Format(time.StampNano)})
 	grpc.SendHeader(ctx, header)
 
@@ -64,10 +67,11 @@ func (s *server) GetOrder(ctx context.Context, orderId *wrapper.StringValue) (*p
 func (s *server) SearchOrders(searchQuery *wrappers.StringValue, stream pb.OrderManagement_SearchOrdersServer) error {
 
 	defer func() {
+		// 创建并发送 trailer
 		trailer := metadata.Pairs("timestamp", time.Now().Format(time.StampNano))
 		stream.SetTrailer(trailer)
 	}()
-
+	// 创建并发送头信息
 	header := metadata.New(map[string]string{"location": "MTV", "timestamp": time.Now().Format(time.StampNano)})
 	stream.SendHeader(header)
 

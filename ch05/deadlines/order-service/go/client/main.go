@@ -24,15 +24,19 @@ func main() {
 
 
 	clientDeadline := time.Now().Add(time.Duration(2 * time.Second))
+	// 在当前上下文中设置 2 秒的截止时间
 	ctx, cancel := context.WithDeadline(context.Background(), clientDeadline)
 	defer cancel()
 
 	// Add Order
+	// 调用远程方法并将捕获可能出现的错误
 	order1 := pb.Order{Id: "101", Items:[]string{"iPhone XS", "Mac Book Pro"}, Destination:"San Jose, CA", Price:2300.00}
 	res, addErr := client.AddOrder(ctx, &order1)
 
 	if addErr != nil {
+		// 确定错误码
 		got := status.Code(addErr)
+		// 如果调用超出了指定的截止时间，它应该返回 DEADLINE_EXCEEDE 类型的错误
 		log.Printf("Error Occured -> addOrder : , %v:", got)
 	} else {
 		log.Print("AddOrder Response -> ", res.Value)

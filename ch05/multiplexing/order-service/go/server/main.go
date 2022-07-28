@@ -24,6 +24,7 @@ var orderMap = make(map[string]ordermgt_pb.Order)
 
 
 type helloServer struct{}
+
 // SayHello implements helloworld.GreeterServer
 func (s *helloServer) SayHello(ctx context.Context, in *hello_pb.HelloRequest) (*hello_pb.HelloReply, error) {
 	log.Printf("Greeter Service - SayHello RPC")
@@ -143,12 +144,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+	// 创建 gRPC 服务器端
 	grpcServer := grpc.NewServer()
 
 	// Register Order Management service on gRPC orderMgtServer
+	// 注册订单管理服务
 	ordermgt_pb.RegisterOrderManagementServer(grpcServer, &orderMgtServer{})
 
 	// Register Greeter Service on gRPC orderMgtServer
+	// 注册问候服务
+	// 问题是 helloServer 结构体实现的是 helloworld.pb.go 中的接口
+	// 但是 RegisterGreeterServer 方法调用的是helloworld_grpc.pb.go 中的方法
 	hello_pb.RegisterGreeterServer(grpcServer, &helloServer{})
 
 	// Register reflection service on gRPC orderMgtServer.

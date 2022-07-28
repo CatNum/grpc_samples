@@ -24,6 +24,7 @@ func main() {
 	client := pb.NewOrderManagementClient(conn)
 
 	// ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
+	// 获取对 cancel 的引用
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -88,6 +89,7 @@ func main() {
 
 	// Process Order
 	streamProcOrder, _ := client.ProcessOrders(ctx)
+	// 通过流发送消息给服务
 	_ = streamProcOrder.Send(&wrapper.StringValue{Value:"102"})
 	_ = streamProcOrder.Send(&wrapper.StringValue{Value:"103"})
 	_ = streamProcOrder.Send(&wrapper.StringValue{Value:"104"})
@@ -98,7 +100,9 @@ func main() {
 	time.Sleep(time.Millisecond * 1000)
 
 	// Cancelling the RPC
+	// 在客户端取消 RPC
 	cancel()
+	// 当前上下文的状态
 	log.Printf("RPC Status : %s", ctx.Err())
 
 	_ = streamProcOrder.Send(&wrapper.StringValue{Value:"101"})
@@ -111,6 +115,7 @@ func main() {
 
 func asncClientBidirectionalRPC (streamProcOrder pb.OrderManagement_ProcessOrdersClient, c chan bool) {
 	for {
+		// 当试图从已取消的上下文中接收消息时，会返回上下已取消的错误
 		combinedShipment, errProcOrder := streamProcOrder.Recv()
 		if errProcOrder != nil {
 			log.Printf("Error Receiving messages %v", errProcOrder)

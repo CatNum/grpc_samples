@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	pb "github.com/grpc-up-and-running/samples/ch05/interceptors/order-service/go/order-service-gen"
-	hwpb "google.golang.org/grpc/examples/helloworld/helloworld"
 	"google.golang.org/grpc"
+	hwpb "google.golang.org/grpc/examples/helloworld/helloworld"
 	"google.golang.org/grpc/status"
 	"log"
 	"time"
@@ -17,6 +17,7 @@ const (
 
 func main() {
 	// Setting up a connection to the server.
+	// 建立到服务器端的连接
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
@@ -25,6 +26,7 @@ func main() {
 
 
 	// *********** Calling the Order Management gRPC service **********
+	// 使用创建的 gRPC 连接来建立 OrderManagement 客户端
 	orderManagementClient := pb.NewOrderManagementClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -44,6 +46,7 @@ func main() {
 
 
 	// *********** Calling the Greeter gRPC service  **********
+	// 使用小童的 gRPC 连接来建立 Heool 客户端
 	helloClient := hwpb.NewGreeterClient(conn)
 
 	hwcCtx, hwcCancel := context.WithTimeout(context.Background(), time.Second)

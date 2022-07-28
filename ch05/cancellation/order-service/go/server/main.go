@@ -88,6 +88,7 @@ func (s *server) ProcessOrders(stream pb.OrderManagement_ProcessOrdersServer) er
 	var combinedShipmentMap = make(map[string]pb.CombinedShipment)
 	for {
 		// You can determine whether the current RPC is cancelled by the other party.
+		// 可以判断当前的 RPC 是否已经被对方取消
 		if stream.Context().Err() == context.Canceled {
 			log.Printf(" Context Cacelled for this stream: -> %s", stream.Context().Err())
 			log.Printf("Stopped processing any more order of this stream!")

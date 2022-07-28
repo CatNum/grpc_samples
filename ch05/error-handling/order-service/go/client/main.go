@@ -29,17 +29,23 @@ func main() {
 
 	// Add Order
 	// This is an invalid order
+	// 这是一个非法订单
 	order1 := pb.Order{Id: "-1", Items:[]string{"iPhone XS", "Mac Book Pro"}, Destination:"San Jose, CA", Price:2300.00}
+	// 调用 AddOrder 远程方法并将错误赋值给 addOrderError
 	res, addOrderError := client.AddOrder(ctx, &order1)
 
 
 	if addOrderError != nil {
+		// 使用 status 包获取错误码
 		errorCode := status.Code(addOrderError)
+		// 检查 InvalidArgument 错误码
 		if errorCode == codes.InvalidArgument {
 			log.Printf("Invalid Argument Error : %s", errorCode)
+			// 从错误中获取错误状态
 			errorStatus := status.Convert(addOrderError)
 			for _, d := range errorStatus.Details() {
 				switch info := d.(type) {
+				// 检查 BadRequest_FieldViolation 错误类型
 				case *epb.BadRequest_FieldViolation:
 					log.Printf("Request Field Invalid: %s", info)
 				default:

@@ -37,8 +37,11 @@ func makeRPCs(cc *grpc.ClientConn, n int) {
 
 func main() {
 	pickfirstConn, err := grpc.Dial(
+		// 使用模式和服务名创建 gRPC 连接。模式是通过模式解析器解析的，它是客户端应用程序的一部分。
 		fmt.Sprintf("%s:///%s", exampleScheme, exampleServiceName), // "example:///lb.example.grpc.io"
-		// grpc.WithBalancerName("pick_first"), // "pick_first" is the default, so this DialOption is not necessary.
+		// "pick_first" is the default, so this DialOption is not necessary.
+		// "pick_first" 是默认的，所以不是必须的
+		//grpc.WithBalancerName("pick_first"),
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -52,6 +55,7 @@ func main() {
 	// Make another ClientConn with round_robin policy.
 	roundrobinConn, err := grpc.Dial(
 		fmt.Sprintf("%s:///%s", exampleScheme, exampleServiceName), // // "example:///lb.example.grpc.io"
+		// 使用轮询调度算法 方法已经废弃了
 		grpc.WithBalancerName("round_robin"), // This sets the initial balancing policy.
 		grpc.WithInsecure(),
 	)

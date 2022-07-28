@@ -28,6 +28,7 @@ func main() {
 
 	// RPC: Add Order
 	order1 := pb.Order{Id: "101", Items:[]string{"iPhone XS", "Mac Book Pro"}, Destination:"San Jose, CA", Price:2300.00}
+	// 设置压缩器 grpc.UseCompressor(gzip.Name)
 	res, _ := client.AddOrder(ctx, &order1, grpc.UseCompressor(gzip.Name))
 
 	log.Print("AddOrder Response -> ", res.Value)

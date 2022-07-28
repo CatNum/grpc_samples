@@ -126,17 +126,22 @@ func (s *server) ProcessOrders(stream pb.OrderManagement_ProcessOrdersServer) er
 
 
 // Server :: Unary Interceptor
+// 服务器：一元拦截器
 func orderUnaryServerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	// Pre-processing logic
+	// 前置处理逻辑
 	// Gets info about the current RPC call by examining the args passed in
+	// 通过检查传入的参数，获取关于当前 RPC 的信息
 	log.Println("======= [Server Interceptor] ", info.FullMethod)
 	log.Printf(" Pre Proc Message : %s", req)
 
 
 	// Invoking the handler to complete the normal execution of a unary RPC.
+	// 调用 handler 完成一元RPC的正常执行
 	m, err := handler(ctx, req)
 
 	// Post processing logic
+	// 后置处理逻辑
 	log.Printf(" Post Proc Message : %s", m)
 	return m, err
 }
@@ -144,6 +149,7 @@ func orderUnaryServerInterceptor(ctx context.Context, req interface{}, info *grp
 
 // wrappedStream wraps around the embedded grpc.ServerStream, and intercepts the RecvMsg and
 // SendMsg method call.
+// wrappedStream 包装嵌入的 grpc.ServerStream 并拦截 RecvMsg 和 SendMsg 方法的调用
 type wrappedStream struct {
 	grpc.ServerStream
 }
@@ -165,9 +171,11 @@ func newWrappedStream(s grpc.ServerStream) grpc.ServerStream {
 
 func orderServerStreamInterceptor(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	// Pre-processing
+	// 前置处理
 	log.Println("====== [Server Stream Interceptor] ", info.FullMethod)
 
 	// Invoking the StreamHandler to complete the execution of RPC invocation
+	// 调用 StreamHandler 去完成执行 RPC 调用
 	err := handler(srv, newWrappedStream(ss))
 	if err != nil {
 		log.Printf("RPC failed with error %v", err)
@@ -181,9 +189,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+	// 在服务器端注册拦截器
 	s := grpc.NewServer(
-		grpc.UnaryInterceptor(orderUnaryServerInterceptor),
-		grpc.StreamInterceptor(orderServerStreamInterceptor))
+		grpc.UnaryInterceptor(orderUnaryServerInterceptor),   // 一元
+		grpc.StreamInterceptor(orderServerStreamInterceptor)) // 流
+	// 注册服务
 	pb.RegisterOrderManagementServer(s, &server{})
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

@@ -33,7 +33,7 @@ func (s *server) AddOrder(ctx context.Context, orderReq *pb.Order) (*wrappers.St
 	log.Println("Sleeping for :",  sleepDuration, "s")
 
 	time.Sleep(time.Duration(sleepDuration) * time.Second)
-
+	// 来判断客户端是否已经满足超出截止时间的状态
 	if ctx.Err() == context.DeadlineExceeded {
 		log.Printf("RPC has reached deadline exceeded state : %s", ctx.Err())
 		return nil, ctx.Err()

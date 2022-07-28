@@ -31,27 +31,32 @@ func main() {
 
 
 	// ****** Metadata : Creation *****
-
+	// 创建元数据
 	md := metadata.Pairs(
 		"timestamp", time.Now().Format(time.StampNano),
 		"kn", "vn",
 	)
+	// 基于新的元数据创建新的上下文
 	mdCtx := metadata.NewOutgoingContext(context.Background(), md)
-
+	// 在现有的上下文中附加更多的元数据
 	ctxA := metadata.AppendToOutgoingContext(mdCtx, "k1", "v1", "k1", "v2", "k2", "v3")
 
 
 	// RPC using the context with new metadata.
+	// 用来存储 RPC 所返回头信息和 trailer 的变量
 	var header, trailer metadata.MD
 
 
 	// RPC: Add Order
 	order1 := pb.Order{Id: "101", Items:[]string{"iPhone XS", "Mac Book Pro"}, Destination:"San Jose, CA", Price:2300.00}
+	// AddOrder 使用带有元数据的新上下文
+	// 传递头信息和 trailer 引用来存储一元 RPC 所返回的值
 	res, _ := client.AddOrder(ctxA, &order1, grpc.Header(&header), grpc.Trailer(&trailer))
 
 	log.Print("AddOrder Response -> ", res.Value)
 
 	// Reading the headers
+	// 处理头信息  读取头信息
 	if t, ok := header["timestamp"]; ok {
 		log.Printf("timestamp from header:\n")
 		for i, e := range t {
@@ -71,6 +76,7 @@ func main() {
 
 
 	// Search Order
+
 	searchStream, _ := client.SearchOrders(ctxA, &wrapper.StringValue{Value: "Google"})
 	for {
 		searchOrder, err := searchStream.Recv()

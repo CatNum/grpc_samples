@@ -29,12 +29,14 @@ type server struct {
 }
 
 // Simple RPC
+// 通过 status 包可以很容易的基于所需的错误码和详情创建错误状态
 func (s *server) AddOrder(ctx context.Context, orderReq *pb.Order) (*wrappers.StringValue, error) {
-
+	// 非法请求，需要生成一个错误并将其返回给客户端
 	if orderReq.Id == "-1" {
 		log.Printf("Order ID is invalid! -> Received Order ID %s", orderReq.Id)
-
+		// 创建一个错误码为 InvalidArgument 的新错误状态
 		errorStatus := status.New(codes.InvalidArgument, "Invalid information received")
+		// 包含错误类型 BadRequest_FieldViolation 的所有错误详情
 		ds, err := errorStatus.WithDetails(
 			&epb.BadRequest_FieldViolation{
 				Field:"ID",
@@ -44,7 +46,7 @@ func (s *server) AddOrder(ctx context.Context, orderReq *pb.Order) (*wrappers.St
 		if err != nil {
 			return nil, errorStatus.Err()
 		}
-
+		// 返回生成的错误
 		return nil, ds.Err()
 	} else {
 		orderMap[orderReq.Id] = *orderReq
