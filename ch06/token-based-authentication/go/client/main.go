@@ -27,6 +27,7 @@ const (
 
 func main() {
 	// Set up the credentials for the connection.
+	// 设置连接的凭证，需要提供 OAuth 令牌值来创建凭证。这里使用一个硬编码的字符串值作为令牌的值。
 	perRPC := oauth.NewOauthAccess(fetchToken())
 
 	crtFile := filepath.Join("..", "..", "certs", "server.crt")
@@ -35,6 +36,8 @@ func main() {
 		log.Fatalf("failed to load credentials: %v", err)
 	}
 	opts := []grpc.DialOption{
+		// 配置 gRPC DialOption，为同一个连接的所有 RPC 使用同一个令牌。
+		// 如果想为每个调用使用专门的 OAuth 令牌，那么需要使用 CallOption 配置 gRPC 调用。
 		grpc.WithPerRPCCredentials(perRPC),
 		// transport credentials.
 		grpc.WithTransportCredentials(creds),

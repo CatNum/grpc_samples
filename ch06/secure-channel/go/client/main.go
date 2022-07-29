@@ -24,24 +24,29 @@ const (
 )
 
 func main() {
+	// 读取并解析公开证书，创建启用 TLS 的证书。
 	creds, err := credentials.NewClientTLSFromFile(crtFile, hostname)
 	if err != nil {
 		log.Fatalf("failed to load credentials: %v", err)
 	}
 	opts := []grpc.DialOption{
 		// transport credentials.
+		// 以 DialOption 的形式添加传输凭证。
 		grpc.WithTransportCredentials(creds),
 	}
 
 	// Set up a connection to the server.
+	// 通过传入 dial 选项，建立到服务器的安全连接。
 	conn, err := grpc.Dial(address, opts...)
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
+	// 传入连接并创建存根。该存根实例包含了调用服务器的所有远程方法。
 	c := pb.NewProductInfoClient(conn)
 
 	// Contact the server and print out its response.
+	// 连接服务器并打印响应
 	name := "Sumsung S10"
 	description := "Samsung Galaxy S10 is the latest smart phone, launched in February 2019"
 	price := float32(700.0)

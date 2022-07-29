@@ -54,25 +54,28 @@ func (s *server) GetProduct(ctx context.Context, in *wrapper.StringValue) (*pb.P
 }
 
 func main() {
+	//  读取和解析公钥–私钥对，并创建启用 TLS 的证书。
 	cert, err := tls.LoadX509KeyPair(crtFile, keyFile)
 	if err != nil {
 		log.Fatalf("failed to load key pair: %s", err)
 	}
 	opts := []grpc.ServerOption{
 		// Enable TLS for all incoming connections.
+		// 添加证书作为 TLS 服务器凭证，从而为所有传入的连接启用TLS。
 		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
 	}
-
+	// 通过传入 TLS 服务器凭证来创建新的 gRPC 服务器实例。
 	s := grpc.NewServer(opts...)
+	// 通过调用生成的 API，将服务实现注册到新创建的 gRPC 服务器上。
 	pb.RegisterProductInfoServer(s, &server{})
 	// Register reflection service on gRPC server.
 	//reflection.Register(s)
-
+	// 在端口 50051 上创建 TCP 监听器。
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-
+	// 绑定 gRPC 服务器到监听器，并开始监听端口 50051 上传入的消息。
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

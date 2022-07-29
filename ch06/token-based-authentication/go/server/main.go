@@ -68,7 +68,8 @@ func main() {
 	opts := []grpc.ServerOption{
 		// Enable TLS for all incoming connections.
 		grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
-
+		// 添加新的服务器选项（grpc.ServerOption）以及 TLS 服务器证书。
+		// 借助 grpc.UnaryInterceptor 函数，添加拦截器以拦截所有来自客户端的请求。
 		grpc.UnaryInterceptor(ensureValidToken),
 	}
 
@@ -103,6 +104,9 @@ func valid(authorization []string) bool {
 // the token is missing or invalid, the interceptor blocks execution of the
 // handler and returns an error. Otherwise, the interceptor invokes the unary
 // handler.
+// ensureValidToken 确保请求的元数据中存在有效令牌。
+// 如果令牌丢失或无效，拦截器阻止执行处理程序并返回错误。
+// 否则，拦截器调用一元处理程序。
 func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {

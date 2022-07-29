@@ -1,3 +1,4 @@
+English | [简体中文](./README-ch.md)
 # Generate private RSA key
 
 To generate RSA key using OpenSSL tool, we need to use `genrsa` command like below,
@@ -15,6 +16,7 @@ e is 65537 (0x10001)
 2. Specifies the name of the generated key. Can have any name with `.key` as extension.
 3. Specifies the size of the key. The default size for RSA keys is only 512 bits, which is not secure because an
  intruder can use brute force to recover your private key. So we use a 2048-bit RSA key which is considered to be secure.
+
 
 Here you can also add a passphrase to the key. So you need the passphrase whenever you need to use the key. In this example, we are not going to add a passphrase to the key.
 

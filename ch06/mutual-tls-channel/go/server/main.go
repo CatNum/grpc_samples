@@ -57,12 +57,14 @@ var (
 )
 
 func main() {
+	// 通过服务器端的证书和密钥直接创建 X.509 密钥对。
 	certificate, err := tls.LoadX509KeyPair(crtFile, keyFile)
 	if err != nil {
 		log.Fatalf("failed to load key pair: %s", err)
 	}
 
 	// Create a certificate pool from the certificate authority
+	// 通过 CA 创建证书池。
 	certPool := x509.NewCertPool()
 	ca, err := ioutil.ReadFile(caFile)
 	if err != nil {
@@ -70,12 +72,14 @@ func main() {
 	}
 
 	// Append the client certificates from the CA
+	// 将来自 CA 的客户端证书附加到证书池中。
 	if ok := certPool.AppendCertsFromPEM(ca); !ok {
 		log.Fatalf("failed to append client certs")
 	}
 
 	opts := []grpc.ServerOption{
 		// Enable TLS for all incoming connections.
+		// 通过创建 TLS 凭证为所有传入的连接启用 TLS。
 		grpc.Creds(    // Create the TLS credentials
 			credentials.NewTLS(&tls.Config {
 				ClientAuth:   tls.RequireAndVerifyClientCert,
@@ -85,16 +89,20 @@ func main() {
 			)),
 	}
 
+	// 通过传入的 TLS 服务器凭证创建新的 gRPC 服务器实例。
 	s := grpc.NewServer(opts...)
+	// 通过调用生成的 API 将 gRPC 服务注册到新创建的 gRPC 服务器上。
 	pb.RegisterProductInfoServer(s, &server{})
 	// Register reflection service on gRPC server.
 	//reflection.Register(s)
 
+	// 在端口 50051 上创建 TCP 监听器。
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
+	//绑定 gRPC 服务器到监听器，并开始在端口 50051 上监听传入的消息。
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
